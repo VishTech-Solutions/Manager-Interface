@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHRI HARI-METRO Schedule Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f3ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-title h1 {
+            font-size: 28px;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .header-title p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .date-info {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .date-badge {
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        .date-badge.start {
+            background: #faf5ff;
+            color: #7c3aed;
+            border: 2px solid #e9d5ff;
+        }
+
+        .date-badge.end {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 2px solid #dbeafe;
+        }
+
+        .date-badge span {
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .start-screen {
+            max-width: 600px;
+            margin: 100px auto;
+            background: white;
+            padding: 50px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            background: #7c3aed;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 40px;
+        }
+
+        .start-screen h1 {
+            font-size: 32px;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .start-screen p {
+            color: #6b7280;
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .form-group input[type="date"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input[type="date"]:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 18px;
+            background: #7c3aed;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .week-tabs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .week-tab {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #6b7280;
+        }
+
+        .week-tab.active.week1 {
+            background: #fb923c;
+            color: white;
+            box-shadow: 0 8px 25px rgba(251, 146, 60, 0.4);
+        }
+
+        .week-tab.active.week2 {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .week-tab:hover:not(.active) {
+            background: #f3f4f6;
+        }
+
+        .employee-section {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .employee-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .employee-header h2 {
+            font-size: 20px;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* existing CSS में कहीं भी add करो */
+        #loadingSpinner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+        }
+
+        .spinner-overlay {
+            background: rgba(255, 255, 255, 0.9);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spinner-container {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .spinner-container p {
+            margin-top: 15px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .loader {
+            width: 50px;
+            height: 165px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .loader::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            transform: translate(-50%, 0);
+            width: 16px;
+            height: 16px;
+            background: #FF3D00;
+            border-radius: 50%;
+            animation: bounce 2s linear infinite;
+        }
+
+        .loader::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            height: 48px;
+            width: 48px;
+            background: #fff;
+            border-radius: 4px;
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            50%,
+            100% {
+                transform: translate(-50%, 0px);
+                height: 20px;
+            }
+
+            20% {
+                transform: translate(-25%, 85px);
+                height: 28px;
+            }
+
+            25% {
+                transform: translate(-25%, 110px);
+                height: 12px;
+            }
+
+            70% {
+                transform: translate(-75%, 85px);
+                height: 28px;
+            }
+
+            75% {
+                transform: translate(-75%, 108px);
+                height: 12px;
+            }
+        }
+
+        @keyframes rotate {
+
+            0%,
+            50%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(90deg);
+            }
+
+            75% {
+                transform: rotate(-90deg);
+            }
+        }
+
+        .btn-add {
+            padding: 10px 20px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-add:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .add-employee-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .add-employee-form input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+
+        .add-employee-form input:focus {
+            outline: none;
+            border-color: #10b981;
+        }
+
+        .employee-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .employee-tag {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            background: #f3e8ff;
+            border-radius: 10px;
+        }
+
+        .employee-tag span {
+            font-weight: 600;
+            color: #7c3aed;
+        }
+
+        .btn-remove {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-remove:hover {
+            color: #dc2626;
+        }
+
+        .schedule-card {
+            background: white;
+            border-radius: 20px;
+            overflow-x: auto;
+            overflow-y: visible;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .schedule-table thead {
+            background: #fb923c;
+            color: white;
+        }
+
+        .schedule-table.week2 thead {
+            background: #3b82f6;
+        }
+
+        .schedule-table th {
+            padding: 18px 15px;
+            font-weight: 600;
+            text-align: left;
+            font-size: 15px;
+        }
+
+        .schedule-table th.center {
+            text-align: center;
+        }
+
+        .totals-row {
+            background: #fef3c7 !important;
+            font-weight: 700;
+            border-top: 3px solid #f59e0b;
+        }
+
+        .totals-row td {
+            padding: 12px 15px !important;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .totals-label {
+            color: #92400e;
+            font-weight: 700;
+            text-align: left !important;
+        }
+
+        .weekday-hours {
+            color: #065f46;
+            background: #d1fae5;
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .weekend-hours {
+            color: #7c2d12;
+            background: #fed7aa;
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .total-hours {
+            color: #1e40af;
+            background: #dbeafe;
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            font-size: 15px;
+        }
+
+        .schedule-table tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .schedule-table td {
+            padding: 15px;
+        }
+
+        .date-cell {
+            min-width: 120px;
+        }
+
+        .date-cell .day {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 15px;
+        }
+
+        .date-cell .date {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        .checkbox-cell {
+            text-align: center;
+        }
+
+        .holiday-checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .holiday-checkbox:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .time-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 8px 12px;
+            transition: all 0.3s;
+        }
+
+        .time-input-wrapper:focus-within {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .time-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 4px;
+        }
+
+        .error-input {
+            border-color: #ef4444 !important;
+            background-color: #fee2e2 !important;
+            color: #dc2626;
+        }
+
+        .error-input:focus {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .popup-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        .popup-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #fb923c 0%, #f59e0b 100%);
+            border-radius: 16px 16px 0 0;
+            color: white;
+        }
+
+        .popup-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .popup-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-body {
+            padding: 25px 20px;
+            font-size: 16px;
+            color: #374151;
+            line-height: 1.5;
+        }
+
+        .popup-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #e5e7eb;
+            text-align: right;
+        }
+
+        .popup-ok {
+            padding: 10px 24px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .popup-ok:hover {
+            background: #2563eb;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .submit-section {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .btn-submit {
+            padding: 20px 60px;
+            background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 40px rgba(124, 58, 237, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 50px rgba(124, 58, 237, 0.4);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .start-screen {
+                padding: 30px 20px;
+                margin: 50px auto;
+            }
+
+            .start-screen h1 {
+                font-size: 24px;
+            }
+
+            .icon-circle {
+                width: 60px;
+                height: 60px;
+                font-size: 30px;
+            }
+
+            .header-card {
+                padding: 20px;
+            }
+
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-title h1 {
+                font-size: 20px;
+            }
+
+            .week-tabs {
+                flex-direction: column;
+            }
+
+            .week-tab {
+                width: 100%;
+            }
+
+            .employee-section {
+                padding: 15px;
+            }
+
+            .employee-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .employee-header h2 {
+                font-size: 18px;
+            }
+
+            .btn-add {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .schedule-card {
+                margin: 0 -10px;
+                border-radius: 12px;
+            }
+
+            .schedule-table {
+                font-size: 12px;
+                min-width: 600px;
+            }
+
+            .schedule-table th,
+            .schedule-table td {
+                padding: 8px 6px;
+            }
+
+            .time-input-wrapper {
+                padding: 6px 8px;
+            }
+
+            .time-input {
+                font-size: 13px;
+            }
+
+            .date-cell {
+                min-width: 90px;
+            }
+
+            .date-cell .day {
+                font-size: 13px;
+            }
+
+            .date-cell .date {
+                font-size: 11px;
+            }
+
+            .btn-submit {
+                padding: 16px 40px;
+                font-size: 16px;
+            }
+
+            .submit-section {
+                padding: 15px 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- </body> से ठीक पहले ये add करो -->
+    <div id="loadingSpinner" class="hidden">
+        <div class="spinner-overlay">
+            <div class="spinner-container">
+                <div class="loader"></div>
+                <p>Submitting to Payroll...</p>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div id="startScreen" class="start-screen">
+            <div class="icon-circle">📅</div>
+            <h1>SHRI HARI-METRO WILLIAMTOWN</h1>
+            <p>Schedule Manager</p>
+
+            <div class="form-group">
+                <label>Select Start Date</label>
+                <input type="date" id="startDateInput">
+            </div>
+
+            <button class="btn-primary" onclick="startSchedule()">Start Creating Schedule</button>
+        </div>
+
+        <div id="mainApp" class="hidden">
+            <div class="header-card">
+                <div class="header-top">
+                    <div class="header-title">
+                        <h1>SHRI HARI-METRO WILLIAMTOWN</h1>
+                        <p>Schedule Manager - <span id="currentWeekLabel">Week 1</span></p>
+                    </div>
+                    <div class="date-info">
+                        <div class="date-badge start">
+                            Start: <span id="startDateDisplay"></span>
+                        </div>
+                        <div class="date-badge end">
+                            End: <span id="endDateDisplay"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="week-tabs">
+                <button class="week-tab active week1" onclick="switchWeek(1)">WEEK 1</button>
+                <button class="week-tab week2" onclick="switchWeek(2)">WEEK 2</button>
+            </div>
+
+            <div class="employee-section">
+                <div class="employee-header">
+                    <h2>👥 Employees</h2>
+                    <button class="btn-add" onclick="toggleAddEmployee()">
+                        <span>+</span> Add Employee
+                    </button>
+                </div>
+
+                <div id="addEmployeeForm" class="add-employee-form hidden">
+                    <input type="text" id="newEmployeeInput" placeholder="Enter employee name"
+                        onkeypress="handleEmployeeKeyPress(event)">
+                    <button class="btn-add" onclick="addEmployee()">Add</button>
+                </div>
+
+                <div class="employee-list" id="employeeList"></div>
+            </div>
+
+            <div class="schedule-card">
+                <table class="schedule-table" id="scheduleTable">
+                    <thead>
+                        <tr id="headerRow">
+                            <th>Date</th>
+                            <th class="center">Holiday</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleBody"></tbody>
+                </table>
+            </div>
+
+            <div id="submitSection" class="submit-section hidden">
+                <button class="btn-submit" onclick="submitToPayroll()">
+                    <span>📤</span> SUBMIT TO PAYROLL
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="customPopup" class="hidden">
+        <div class="popup-overlay">
+            <div class="popup-content">
+                <div class="popup-header">
+                    <h3>⚠️ Alert</h3>
+                    <button class="popup-close" onclick="closePopup()">×</button>
+                </div>
+                <div class="popup-body" id="popupMessage">
+                    Message will appear here
+                </div>
+                <div class="popup-footer">
+                    <button class="popup-ok" onclick="closePopup()">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var state = {
+            startDate: null,
+            endDate: null,
+            currentWeek: 1,
+            employees: ['Vishwa', 'Janki', 'Dhaval'],
+            scheduleData: {
+                1: {},
+                2: {}
+            }
+        };
+
+        function saveToStorage() {
+            try {
+                localStorage.setItem('scheduleState', JSON.stringify(state));
+            } catch (e) {
+                console.log('Storage not available');
+            }
+        }
+
+        function loadFromStorage() {
+            try {
+                var saved = localStorage.getItem('scheduleState');
+                if (saved) {
+                    state = JSON.parse(saved);
+                    return true;
+                }
+            } catch (e) {
+                console.log('Could not load from storage');
+            }
+            return false;
+        }
+
+
+
+
+        // Custom Popup Functions
+        function showPopup(message) {
+            document.getElementById('popupMessage').innerHTML = message;
+            document.getElementById('customPopup').classList.remove('hidden');
+        }
+
+        function closePopup() {
+            document.getElementById('customPopup').classList.add('hidden');
+        }
+
+        // Close popup when clicking outside
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('customPopup').addEventListener('click', function (e) {
+                if (e.target.id === 'customPopup') {
+                    closePopup();
+                }
+            });
+
+            // Close with Escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && !document.getElementById('customPopup').classList.contains('hidden')) {
+                    closePopup();
+                }
+            });
+        });
+
+
+        function init() {
+            var hasData = loadFromStorage();
+
+            if (hasData && state.startDate) {
+                document.getElementById('startScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                updateDisplay();
+            }
+
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDateInput').setAttribute('min', today);
+        }
+
+        function startSchedule() {
+            var startDateInput = document.getElementById('startDateInput').value;
+            if (!startDateInput) {
+                showPopup('Please select a start date');
+                return;
+            }
+
+            state.startDate = startDateInput;
+
+            var start = new Date(startDateInput);
+            var end = new Date(start);
+            end.setDate(start.getDate() + 13);
+            state.endDate = end.toISOString().split('T')[0];
+
+            generateDates(start);
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+
+            saveToStorage();
+            updateDisplay();
+        }
+
+        function generateDates(start) {
+            var daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+            for (var week = 1; week <= 2; week++) {
+                for (var day = 0; day < 7; day++) {
+                    var currentDate = new Date(start);
+                    currentDate.setDate(start.getDate() + ((week - 1) * 7) + day);
+                    var dateStr = currentDate.toISOString().split('T')[0];
+                    var dayIndex = currentDate.getDay();
+
+                    if (!state.scheduleData[week][dateStr]) {
+                        // Saturday (6) या Sunday (0) हो तो automatically holiday
+                        var isWeekend = (dayIndex === 0 || dayIndex === 6);
+
+                        state.scheduleData[week][dateStr] = {
+                            publicHoliday: isWeekend  // Weekend को automatically true
+                        };
+
+                        for (var i = 0; i < state.employees.length; i++) {
+                            state.scheduleData[week][dateStr][state.employees[i]] = '';
+                        }
+                    }
+                }
+            }
+            saveToStorage();
+        }
+
+        function updateDisplay() {
+            document.getElementById('startDateDisplay').textContent = new Date(state.startDate).toLocaleDateString();
+            document.getElementById('endDateDisplay').textContent = new Date(state.endDate).toLocaleDateString();
+            document.getElementById('currentWeekLabel').textContent = 'Week ' + state.currentWeek;
+
+            renderEmployees();
+            renderSchedule();
+
+            if (state.currentWeek === 2) {
+                document.getElementById('submitSection').classList.remove('hidden');
+            } else {
+                document.getElementById('submitSection').classList.add('hidden');
+            }
+        }
+
+        function switchWeek(week) {
+            state.currentWeek = week;
+
+            var tabs = document.querySelectorAll('.week-tab');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            tabs[week - 1].classList.add('active');
+
+            var table = document.getElementById('scheduleTable');
+            table.classList.remove('week1', 'week2');
+            table.classList.add('week' + week);
+
+            saveToStorage();
+            updateDisplay();
+        }
+
+        function toggleAddEmployee() {
+            var form = document.getElementById('addEmployeeForm');
+            form.classList.toggle('hidden');
+            if (!form.classList.contains('hidden')) {
+                document.getElementById('newEmployeeInput').focus();
+            }
+        }
+
+        function handleEmployeeKeyPress(event) {
+            if (event.key === 'Enter') {
+                addEmployee();
+            }
+        }
+
+        function addEmployee() {
+            var input = document.getElementById('newEmployeeInput');
+            var name = input.value.trim();
+
+            if (!name) {
+                showPopup('Please enter employee name');
+                return;
+            }
+
+            if (state.employees.indexOf(name) !== -1) {
+                showPopup('Employee already exists');
+                return;
+            }
+
+            state.employees.push(name);
+
+            for (var week = 1; week <= 2; week++) {
+                var dates = Object.keys(state.scheduleData[week]);
+                for (var i = 0; i < dates.length; i++) {
+                    state.scheduleData[week][dates[i]][name] = '';
+                }
+            }
+
+            input.value = '';
+            document.getElementById('addEmployeeForm').classList.add('hidden');
+
+            saveToStorage();
+            updateDisplay();
+        }
+
+
+        function removeConfirmed(name) {
+            closePopup();
+
+            var newEmployees = [];
+            for (var i = 0; i < state.employees.length; i++) {
+                if (state.employees[i] !== name) {
+                    newEmployees.push(state.employees[i]);
+                }
+            }
+            state.employees = newEmployees;
+
+            for (var week = 1; week <= 2; week++) {
+                var dates = Object.keys(state.scheduleData[week]);
+                for (var i = 0; i < dates.length; i++) {
+                    delete state.scheduleData[week][dates[i]][name];
+                }
+            }
+
+            saveToStorage();
+            updateDisplay();
+        }
+
+
+        function removeEmployee(name) {
+            showPopup('Are you sure you want to remove <strong>' + name + '</strong> from schedule?<br><br><button onclick="removeConfirmed(\'' + name + '\')" style="padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">Yes, Remove</button><button onclick="closePopup()" style="padding: 8px 16px; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer;">Cancel</button>');
+            return; // Add this return
+
+            var newEmployees = [];
+            for (var i = 0; i < state.employees.length; i++) {
+                if (state.employees[i] !== name) {
+                    newEmployees.push(state.employees[i]);
+                }
+            }
+            state.employees = newEmployees;
+
+            for (var week = 1; week <= 2; week++) {
+                var dates = Object.keys(state.scheduleData[week]);
+                for (var i = 0; i < dates.length; i++) {
+                    delete state.scheduleData[week][dates[i]][name];
+                }
+            }
+
+            saveToStorage();
+            updateDisplay();
+        }
+
+        function renderEmployees() {
+            var list = document.getElementById('employeeList');
+            var html = '';
+            for (var i = 0; i < state.employees.length; i++) {
+                var emp = state.employees[i];
+                html += '<div class="employee-tag"><span>' + emp + '</span><button class="btn-remove" onclick="removeEmployee(\'' + emp + '\')">✕</button></div>';
+            }
+            list.innerHTML = html;
+        }
+
+        function renderSchedule() {
+            var week = state.currentWeek;
+            var dates = Object.keys(state.scheduleData[week]).sort();
+            var daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+            var headerRow = document.getElementById('headerRow');
+            var headerHtml = '<th>Date</th><th class="center">Holiday</th>';
+            for (var i = 0; i < state.employees.length; i++) {
+                headerHtml += '<th class="center">' + state.employees[i] + '</th>';
+            }
+            headerRow.innerHTML = headerHtml;
+
+            var tbody = document.getElementById('scheduleBody');
+            var bodyHtml = '';
+
+            var employeeTotals = {};
+            for (var i = 0; i < state.employees.length; i++) {
+                employeeTotals[state.employees[i]] = {
+                    weekday: 0,
+                    weekend: 0,
+                    total: 0
+                };
+            }
+
+            for (var i = 0; i < dates.length; i++) {
+                var dateStr = dates[i];
+                var date = new Date(dateStr);
+                var dayIndex = date.getDay();
+                var dayName = daysOfWeek[dayIndex];
+                var displayDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                var dayData = state.scheduleData[week][dateStr];
+
+                var isWeekend = (dayIndex === 0 || dayIndex === 6);
+                var isHoliday = dayData.publicHoliday;
+
+                bodyHtml += '<tr>';
+                bodyHtml += '<td class="date-cell"><div class="day">' + dayName + '</div><div class="date">' + displayDate + '</div></td>';
+
+                // Saturday/Sunday हो तो checkbox disabled और checked रखो
+                if (isWeekend) {
+                    bodyHtml += '<td class="checkbox-cell"><input type="checkbox" class="holiday-checkbox" checked disabled></td>';
+                } else {
+                    bodyHtml += '<td class="checkbox-cell"><input type="checkbox" class="holiday-checkbox" ' + (dayData.publicHoliday ? 'checked' : '') + ' onchange="toggleHoliday(' + week + ', \'' + dateStr + '\')"></td>';
+                }
+
+                for (var j = 0; j < state.employees.length; j++) {
+                    var emp = state.employees[j];
+                    var value = dayData[emp] || '';
+
+                    if (value) {
+                        var times = value.split('-');
+                        if (times.length === 2) {
+                            var start = parseFloat(times[0].trim());
+                            var end = parseFloat(times[1].trim());
+                            var hours = end - start;
+
+                            // यहाँ IMPORTANT CHANGE:
+                            // यदि publicHoliday है या weekend है, तो weekend में जोड़ो
+                            if (isWeekend || isHoliday) {
+                                employeeTotals[emp].weekend += hours;
+                            } else {
+                                employeeTotals[emp].weekday += hours;
+                            }
+                            employeeTotals[emp].total += hours;
+                        }
+                    }
+
+                    bodyHtml += '<td><div class="time-input-wrapper"><span>🕐</span><input type="text" class="time-input" placeholder=" " value="' + value + '" onchange="updateTime(' + week + ', \'' + dateStr + '\', \'' + emp + '\', this.value)" onblur="validateTimeInput(this, ' + week + ', \'' + dateStr + '\', \'' + emp + '\')"></div></td>';
+                }
+
+                bodyHtml += '</tr>';
+            }
+
+            bodyHtml += '<tr class="totals-row">';
+            bodyHtml += '<td colspan="2" class="totals-label">WEEKDAYS</td>';
+            for (var i = 0; i < state.employees.length; i++) {
+                var emp = state.employees[i];
+                bodyHtml += '<td class="center"><span class="weekday-hours">' + employeeTotals[emp].weekday.toFixed(1) + '</span></td>';
+            }
+            bodyHtml += '</tr>';
+
+            bodyHtml += '<tr class="totals-row">';
+            bodyHtml += '<td colspan="2" class="totals-label">WEEKENDS</td>';
+            for (var i = 0; i < state.employees.length; i++) {
+                var emp = state.employees[i];
+                bodyHtml += '<td class="center"><span class="weekend-hours">' + employeeTotals[emp].weekend.toFixed(1) + '</span></td>';
+            }
+            bodyHtml += '</tr>';
+
+            bodyHtml += '<tr class="totals-row">';
+            bodyHtml += '<td colspan="2" class="totals-label">TOTAL</td>';
+            for (var i = 0; i < state.employees.length; i++) {
+                var emp = state.employees[i];
+                bodyHtml += '<td class="center"><span class="total-hours">' + employeeTotals[emp].total.toFixed(1) + '</span></td>';
+            }
+            bodyHtml += '</tr>';
+
+            tbody.innerHTML = bodyHtml;
+        }
+
+        function toggleHoliday(week, date) {
+            state.scheduleData[week][date].publicHoliday = !state.scheduleData[week][date].publicHoliday;
+            saveToStorage();
+            renderSchedule(); // Real-time update
+        }
+
+        function validateTimeInput(input, week, date, employee) {
+            var value = input.value.trim();
+            if (value && !validateTimeFormat(value)) {
+                input.classList.add('error-input');
+                showPopup('Invalid time format!<br>Start must be less than End.');
+                input.value = '';
+                state.scheduleData[week][date][employee] = '';
+                saveToStorage();
+                renderSchedule();
+                return false;
+            }
+            return true;
+        }
+
+        function updateTime(week, date, employee, value) {
+            var inputField = event.target;
+
+            // सबसे पहले validation check
+            if (value && !validateTimeFormat(value)) {
+                inputField.classList.add('error-input');
+                showPopup('Invalid time format!<br>Start must be less than End.');
+                inputField.value = ''; // Clear invalid input
+                state.scheduleData[week][date][employee] = '';
+                renderSchedule(); // Re-render to remove error
+                return;
+            }
+
+            // Remove error if valid
+            inputField.classList.remove('error-input');
+
+            state.scheduleData[week][date][employee] = value;
+            saveToStorage();
+
+            // Real-time calculation update करने के लिए
+            renderSchedule();
+        }
+
+        function validateTimeFormat(value) {
+            if (!value.trim()) return true;
+
+            // Format: दो numbers जो .5 के multiples हों
+            var pattern = /^(\d+(\.5)?)-(\d+(\.5)?)$/;
+            if (!pattern.test(value)) {
+                return false;
+            }
+
+            var parts = value.split('-');
+            var start = parseFloat(parts[0]);
+            var end = parseFloat(parts[1]);
+
+            // Check if .5 increments में हैं
+            var startDecimal = start % 1;
+            var endDecimal = end % 1;
+
+            // Only 0 या 0.5 allowed
+            if (startDecimal !== 0 && startDecimal !== 0.5) return false;
+            if (endDecimal !== 0 && endDecimal !== 0.5) return false;
+
+            // Range validation
+            if (start < 0 || end > 24) return false;
+            if (start >= end) return false;
+
+            // Allowed specific values (optional - uncomment if needed)
+            // var allowedValues = [5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12];
+            // if (!allowedValues.includes(start) || !allowedValues.includes(end)) return false;
+
+            return true;
+        }
+
+        function submitToPayroll() {
+            var payrollData = [];
+            document.getElementById('loadingSpinner').classList.remove('hidden');
+
+            for (var week = 1; week <= 2; week++) {
+                var dates = Object.keys(state.scheduleData[week]);
+                for (var i = 0; i < dates.length; i++) {
+                    var date = dates[i];
+                    var dayData = state.scheduleData[week][date];
+                    for (var j = 0; j < state.employees.length; j++) {
+                        var emp = state.employees[j];
+                        if (dayData[emp]) {
+                            payrollData.push({
+                                week: week,
+                                date: date,
+                                employee: emp,
+                                timeRange: dayData[emp],
+                                publicHoliday: dayData.publicHoliday ? 'Yes' : 'No'
+                            });
+                        }
+                    }
+                }
+            }
+            // Disable submit button
+            var submitBtn = document.querySelector('.btn-submit');
+            submitBtn.disabled = true;
+
+            if (payrollData.length === 0) {
+                showPopup('No data to submit! Please enter time ranges.');
+                return;
+            }
+
+            // Send to Google Sheets
+            sendToGoogleSheets(payrollData);
+        }
+
+        function sendToGoogleSheets(data) {
+            var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxxxm1FLLHF4Im58mvXxOLW1hxzxtJAU_MVBUbIe_E4Qz21qGFxu929FJ2vhftV0cmi5w/exec';
+
+            var rows = [];
+
+            for (var i = 0; i < data.length; i++) {
+                var entry = data[i];
+                var dateObj = new Date(entry.date);
+                var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                var dayName = dayNames[dateObj.getDay()];
+
+                var timeRange = entry.timeRange;
+                var times = timeRange.split('-');
+                var startTime = times[0] ? parseFloat(times[0].trim()) : '';
+                var endTime = times[1] ? parseFloat(times[1].trim()) : '';
+                var totalHours = (startTime && endTime) ? (endTime - startTime) : '';
+
+                rows.push({
+                    date: entry.date,
+                    name: entry.employee,
+                    day: dayName,
+                    publicHoliday: entry.publicHoliday,
+                    startTime: startTime,
+                    endTime: endTime,
+                    totalHours: totalHours
+                });
+            }
+
+            console.log('Sending data to Google Sheets:', rows);
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(rows)
+            })
+                .then(function () {
+
+                    document.getElementById('loadingSpinner').classList.add('hidden');
+
+                    // Re-enable button
+                    var submitBtn = document.querySelector('.btn-submit');
+                    submitBtn.disabled = false;
+                    showPopup('Data successfully submitted to Google Sheets!');
+
+                    localStorage.removeItem('scheduleState');
+
+                    state = {
+                        startDate: null,
+                        endDate: null,
+                        currentWeek: 1,
+                        employees: ['Vishwa', 'Janki', 'Dhaval'],
+                        scheduleData: {
+                            1: {},
+                            2: {}
+                        }
+                    };
+
+                    document.getElementById('mainApp').classList.add('hidden');
+                    document.getElementById('startScreen').classList.remove('hidden');
+                    document.getElementById('startDateInput').value = '';
+                })
+                .catch(function (error) {
+                    console.error('Error:', error);
+
+                    document.getElementById('loadingSpinner').classList.add('hidden');
+
+                    // Re-enable button
+                    var submitBtn = document.querySelector('.btn-submit');
+                    submitBtn.disabled = false;
+                    
+                    showPopup('Data sent to Google Sheets (check your sheet to confirm)')
+
+                    localStorage.removeItem('scheduleState');
+
+                    state = {
+                        startDate: null,
+                        endDate: null,
+                        currentWeek: 1,
+                        employees: ['Vishwa', 'Janki', 'Dhaval'],
+                        scheduleData: {
+                            1: {},
+                            2: {}
+                        }
+                    };
+
+                    document.getElementById('mainApp').classList.add('hidden');
+                    document.getElementById('startScreen').classList.remove('hidden');
+                    document.getElementById('startDateInput').value = '';
+                });
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
