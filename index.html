@@ -80,6 +80,21 @@
             margin-left: 5px;
         }
 
+
+        .date-badge.cancel {
+            background: #fee2e2 !important;
+            color: #dc2626 !important;
+            border: 2px solid #fca5a5 !important;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .date-badge.cancel:hover {
+            background: #fecaca !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.2);
+        }
+
         .start-screen {
             max-width: 600px;
             margin: 100px auto;
@@ -820,7 +835,7 @@
 
 <body>
 
-    <!-- </body> से ठीक पहले ये add करो -->
+   
     <div id="loadingSpinner" class="hidden">
         <div class="spinner-overlay">
             <div class="spinner-container">
@@ -857,6 +872,19 @@
                         <div class="date-badge end">
                             End: <span id="endDateDisplay"></span>
                         </div>
+                    </div>
+                    <div class="date-info">
+                        <div class="date-badge start">
+                            Start: <span id="startDateDisplay"></span>
+                        </div>
+                        <div class="date-badge end">
+                            End: <span id="endDateDisplay"></span>
+                        </div>
+                        <!-- ये नया CANCEL BUTTON -->
+                        <button class="date-badge cancel" onclick="cancelSchedule()"
+                            style="background: #fee2e2; color: #dc2626; border: 2px solid #fca5a5; cursor: pointer;">
+                            ❌ Cancel Schedule
+                        </button>
                     </div>
                 </div>
             </div>
@@ -983,6 +1011,47 @@
             });
         });
 
+
+
+// CANCEL Popup
+
+        function cancelSchedule() {
+            showPopup(
+                'Are you sure you want to cancel this schedule?<br><br>' +
+                '<strong>⚠️ All data will be lost!</strong><br><br>' +
+                '<button onclick="confirmCancel()" style="padding: 10px 20px; margin: 5px; background: #dc2626; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">YES, CANCEL</button>' +
+                '<button onclick="closePopup()" style="padding: 10px 20px; margin: 5px; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer;">NO, KEEP DATA</button>'
+            );
+        }
+
+        function confirmCancel() {
+            closePopup();
+
+            // Clear localStorage
+            localStorage.removeItem('scheduleState');
+
+            // Reset state
+            state = {
+                startDate: null,
+                endDate: null,
+                currentWeek: 1,
+                employees: ['Vishwa', 'Janki', 'Dhaval'],
+                scheduleData: {
+                    1: {},
+                    2: {}
+                }
+            };
+
+            // Hide main app, show start screen
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+
+            // Clear start date input
+            document.getElementById('startDateInput').value = '';
+
+            // Optional success message
+            showPopup('Schedule cancelled successfully!<br>You can start a new schedule.');
+        }
 
         function init() {
             var hasData = loadFromStorage();
@@ -1463,7 +1532,7 @@
                     // Re-enable button
                     var submitBtn = document.querySelector('.btn-submit');
                     submitBtn.disabled = false;
-                    
+
                     showPopup('Data sent to Google Sheets (check your sheet to confirm)')
 
                     localStorage.removeItem('scheduleState');
